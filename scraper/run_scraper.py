@@ -1,7 +1,5 @@
-import time
+from app.scraper_new_companies import run_scraper
 
-print("Worker scraper is running...")
-
-while True:
-    print("Running scraper iteration…")
-    time.sleep(20)
+if __name__ == "__main__":
+    print("Running scraper from worker...")
+    run_scraper()
