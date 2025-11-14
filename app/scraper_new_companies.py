@@ -34,14 +34,14 @@ async def scrape_orsr_new():
             ico = cols[1]
             city = cols[3]
 
-            # Check if already exists
+            # Skontrolujeme, či firma už existuje (ako placeholder uložíme ICO do website)
             existing = db.query(Company).filter(Company.website == ico).first()
             if existing:
                 continue
 
             company = Company(
                 name=name,
-                website=ico,         # temporarily use ICO in website column
+                website=ico,  # dočasne ukladáme ICO
                 email=None,
                 phone=None,
                 address=city,
@@ -67,14 +67,31 @@ async def scrape_orsr_new():
 # ---------------------------------------------------
 def run_scraper():
     print("[SCRAPER] Starting ORSR new companies scraper...")
+
     try:
-        added = asyncio.run(scrape_orsr_new())
+        # Získame aktuálny event loop
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # Ak loop už beží (Render + FastAPI)
+        if loop.is_running():
+            future = asyncio.run_coroutine_threadsafe(scrape_orsr_new(), loop)
+            added = future.result()
+        else:
+            added = loop.run_until_complete(scrape_orsr_new())
+
         return {"added": added}
+
     except Exception as e:
         print("[SCRAPER] Error:", e)
         return {"error": str(e)}
 
 
-# Pre lokálne testovanie
+# ---------------------------------------------------
+# Lokálne spustenie manuálne
+# ---------------------------------------------------
 if __name__ == "__main__":
     print(run_scraper())
