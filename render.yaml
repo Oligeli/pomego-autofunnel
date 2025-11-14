@@ -14,7 +14,7 @@ services:
   - type: worker
     name: autofunnel-scraper
     env: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Dockerfile.worker
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
