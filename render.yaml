@@ -11,6 +11,19 @@ services:
           name: autofunnel-db
           property: connectionString
 
+  - type: worker
+    name: autofunnel-scraper
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: autofunnel-db
+          property: connectionString
+    startCommand: "python app/scraper_new_companies.py"
+
 databases:
   - name: autofunnel-db
     plan: free
